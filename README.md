@@ -17,7 +17,7 @@ Check https://www.sqlite.org/lang_vacuum.html for more info.
 
 - SQLite3
 - Elixir
-- Livebook.dev
+- [Livebook.dev](https://livebook.dev/)
 
 ## 🤩 Credits
 
