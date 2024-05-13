@@ -34,7 +34,7 @@ Exqlite.query!(conn, "PRAGMA table_list", [])
 <!-- livebook:{"output":true} -->
 
 ```text
-%Exqlite.Result{command: :execute, columns: ["schema", "name", "type", "ncol", "wr", "strict"], rows: [["main", "txs", "table", 5, 0, 0], ["main", "periodic_txs", "table", 7, 0, 0], ["main", "sqlite_schema", "table", 5, 0, 0], ["temp", "sqlite_temp_schema", "table", 5, 0, 0]], num_rows: 4}
+%Exqlite.Result{command: :execute, columns: ["schema", "name", "type", "ncol", "wr", "strict"], rows: [["main", "sqlite_schema", "table", 5, 0, 0], ["temp", "sqlite_temp_schema", "table", 5, 0, 0]], num_rows: 2}
 ```
 
 <!-- livebook:{"branch_parent_index":1} -->
@@ -53,7 +53,7 @@ _ =
     CREATE TABLE IF NOT EXISTS periodic_txs (
       id INTEGER PRIMARY KEY,
       label TEXT NOT NULL,
-      amount INTEGER NOT NULL,
+      amount INTEGER NOT NULL, 
       type INTEGER NOT NULL, -- 0 income, 1 expense
       days INTEGER NOT NULL DEFAULT 1,
       created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -121,14 +121,13 @@ If you want a specifc date must be **ISO 8601** (yyyy-MM-dd hh:mm:ss)
 
 <!-- livebook:{"break_markdown":true} -->
 
-| Name | Amount (USD) | Amount (Cents) | Days | Applied At |
-| ---- | ------------ | -------------- | ---- | ---------- |
-
-|     | Video Stream Service                     | 10  | 1000  | 30  | 2024-04-01 00:00:00 |
-|     | Basic Services (Water, Electricity, Gas) | 50  | 5000  | 30  | 2024-04-01 00:00:00 |
-|     | Internet + Phone                         | 40  | 4000  | 30  | 2024-04-01 00:00:00 |
-|     | Food                                     | 100 | 10000 | 30  | 2024-04-01 00:00:00 |
-|     | Transport                                | 30  | 3000  | 30  | 2024-04-01 00:00:00 |
+| Name                                     | Amount (USD) | Amount (Cents) | Days | Applied At          |
+| ---------------------------------------- | ------------ | -------------- | ---- | ------------------- |
+| Video Stream Service                     | 10           | 1000           | 30   | 2024-04-01 00:00:00 |
+| Basic Services (Water, Electricity, Gas) | 50           | 5000           | 30   | 2024-04-01 00:00:00 |
+| Internet + Phone                         | 40           | 4000           | 30   | 2024-04-01 00:00:00 |
+| Food                                     | 100          | 10000          | 30   | 2024-04-01 00:00:00 |
+| Transport                                | 30           | 3000           | 30   | 2024-04-01 00:00:00 |
 
 ```elixir
 [
@@ -375,7 +374,7 @@ _ = Exqlite.query!(conn, "SELECT * FROM periodic_txs WHERE type = 0;", [])
 <!-- livebook:{"output":true} -->
 
 ```text
-%Exqlite.Result{command: :execute, columns: ["id", "label", "amount", "type", "days", "created_at", "applied_at"], rows: [[6, "Salary", 200000, 0, 30, "2024-05-13 03:36:34", "2024-05-13 03:36:39"]], num_rows: 1}
+%Exqlite.Result{command: :execute, columns: ["id", "label", "amount", "type", "days", "created_at", "applied_at"], rows: [[6, "Salary", 200000, 0, 30, "2024-05-13 03:58:34", "2024-05-13 03:59:50"]], num_rows: 1}
 ```
 
 How much do we have from periodic incomes (In USD)?
@@ -406,7 +405,7 @@ _ =
   Exqlite.query!(
     conn,
     """
-    SELECT * FROM periodic_txs WHERE
+    SELECT * FROM periodic_txs WHERE 
     julianday('now') - julianday(applied_at) >= days AND type = 0;
     """,
     []
@@ -425,24 +424,24 @@ _ =
 
 Lets check all our periodic expenses
 
-<!-- livebook:{"attrs":"eyJjYWNoZV9xdWVyeSI6dHJ1ZSwiY29ubmVjdGlvbiI6eyJ0eXBlIjoic3FsaXRlIiwidmFyaWFibGUiOiJjb25uIn0sImRhdGFfZnJhbWVfYWxpYXMiOiJFbGl4aXIuRXhwbG9yZXIuRGF0YUZyYW1lIiwicXVlcnkiOiJTRUxFQ1QgKiBGUk9NIHBlcmlvZGljX3R4cyBXSEVSRSB0eXBlID0gMTsiLCJyZXN1bHRfdmFyaWFibGUiOiJlZ3Jlc29zIiwidGltZW91dCI6bnVsbH0","chunks":null,"kind":"Elixir.KinoDB.SQLCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"attrs":"eyJjYWNoZV9xdWVyeSI6dHJ1ZSwiY29ubmVjdGlvbiI6eyJ0eXBlIjoic3FsaXRlIiwidmFyaWFibGUiOiJjb25uIn0sImRhdGFfZnJhbWVfYWxpYXMiOiJFbGl4aXIuRXhwbG9yZXIuRGF0YUZyYW1lIiwicXVlcnkiOiJTRUxFQ1QgKiBGUk9NIHBlcmlvZGljX3R4cyBXSEVSRSB0eXBlID0gMTsiLCJyZXN1bHRfdmFyaWFibGUiOiJfIiwidGltZW91dCI6bnVsbH0","chunks":null,"kind":"Elixir.KinoDB.SQLCell","livebook_object":"smart_cell"} -->
 
 ```elixir
-egresos = Exqlite.query!(conn, "SELECT * FROM periodic_txs WHERE type = 1;", [])
+_ = Exqlite.query!(conn, "SELECT * FROM periodic_txs WHERE type = 1;", [])
 ```
 
 <!-- livebook:{"output":true} -->
 
 ```text
-%Exqlite.Result{command: :execute, columns: ["id", "label", "amount", "type", "days", "created_at", "applied_at"], rows: [[1, "Video Stream Service", 1000, 1, 30, "2024-05-13 03:36:27", "2024-05-13 03:36:39"], [2, "Basic Services", 5000, 1, 30, "2024-05-13 03:36:27", "2024-05-13 03:36:39"], [3, "Internet + Phone", 4000, 1, 30, "2024-05-13 03:36:27", "2024-05-13 03:36:39"], [4, "Food", 10000, 1, 30, "2024-05-13 03:36:27", "2024-05-13 03:36:39"], [5, "Transport", 3000, 1, 30, "2024-05-13 03:36:27", "2024-05-13 03:36:39"]], num_rows: 5}
+%Exqlite.Result{command: :execute, columns: ["id", "label", "amount", "type", "days", "created_at", "applied_at"], rows: [[1, "Video Stream Service", 1000, 1, 30, "2024-05-13 03:58:28", "2024-05-13 03:59:50"], [2, "Basic Services", 5000, 1, 30, "2024-05-13 03:58:28", "2024-05-13 03:59:50"], [3, "Internet + Phone", 4000, 1, 30, "2024-05-13 03:58:28", "2024-05-13 03:59:50"], [4, "Food", 10000, 1, 30, "2024-05-13 03:58:28", "2024-05-13 03:59:50"], [5, "Transport", 3000, 1, 30, "2024-05-13 03:58:28", "2024-05-13 03:59:50"]], num_rows: 5}
 ```
 
 How much do we need to cover all our expenses? (In USD)
 
-<!-- livebook:{"attrs":"eyJjYWNoZV9xdWVyeSI6dHJ1ZSwiY29ubmVjdGlvbiI6eyJ0eXBlIjoic3FsaXRlIiwidmFyaWFibGUiOiJjb25uIn0sImRhdGFfZnJhbWVfYWxpYXMiOiJFbGl4aXIuRXhwbG9yZXIuRGF0YUZyYW1lIiwicXVlcnkiOiJTRUxFQ1QgU1VNKGFtb3VudCkgLyAxMDAgQVMgcGVyaW9kaWNfZXhwZW5zZXMgRlJPTSBwZXJpb2RpY190eHMgV0hFUkUgdHlwZSA9IDE7IiwicmVzdWx0X3ZhcmlhYmxlIjoicmVzdWx0MjAiLCJ0aW1lb3V0IjpudWxsfQ","chunks":null,"kind":"Elixir.KinoDB.SQLCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"attrs":"eyJjYWNoZV9xdWVyeSI6dHJ1ZSwiY29ubmVjdGlvbiI6eyJ0eXBlIjoic3FsaXRlIiwidmFyaWFibGUiOiJjb25uIn0sImRhdGFfZnJhbWVfYWxpYXMiOiJFbGl4aXIuRXhwbG9yZXIuRGF0YUZyYW1lIiwicXVlcnkiOiJTRUxFQ1QgU1VNKGFtb3VudCkgLyAxMDAgQVMgcGVyaW9kaWNfZXhwZW5zZXMgRlJPTSBwZXJpb2RpY190eHMgV0hFUkUgdHlwZSA9IDE7IiwicmVzdWx0X3ZhcmlhYmxlIjoiXyIsInRpbWVvdXQiOm51bGx9","chunks":null,"kind":"Elixir.KinoDB.SQLCell","livebook_object":"smart_cell"} -->
 
 ```elixir
-result20 =
+_ =
   Exqlite.query!(
     conn,
     "SELECT SUM(amount) / 100 AS periodic_expenses FROM periodic_txs WHERE type = 1;",
@@ -458,14 +457,14 @@ result20 =
 
 Let's check which expenses has been applied now
 
-<!-- livebook:{"attrs":"eyJjYWNoZV9xdWVyeSI6dHJ1ZSwiY29ubmVjdGlvbiI6eyJ0eXBlIjoic3FsaXRlIiwidmFyaWFibGUiOiJjb25uIn0sImRhdGFfZnJhbWVfYWxpYXMiOiJFbGl4aXIuRXhwbG9yZXIuRGF0YUZyYW1lIiwicXVlcnkiOiJTRUxFQ1QgKiBGUk9NIHBlcmlvZGljX3R4cyBXSEVSRSBcbmp1bGlhbmRheSgnbm93JykgLSBqdWxpYW5kYXkoYXBwbGllZF9hdCkgPj0gZGF5cyBBTkQgdHlwZSA9IDE7IiwicmVzdWx0X3ZhcmlhYmxlIjoiZWdyZXNvc19maWpvcyIsInRpbWVvdXQiOm51bGx9","chunks":null,"kind":"Elixir.KinoDB.SQLCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"attrs":"eyJjYWNoZV9xdWVyeSI6dHJ1ZSwiY29ubmVjdGlvbiI6eyJ0eXBlIjoic3FsaXRlIiwidmFyaWFibGUiOiJjb25uIn0sImRhdGFfZnJhbWVfYWxpYXMiOiJFbGl4aXIuRXhwbG9yZXIuRGF0YUZyYW1lIiwicXVlcnkiOiJTRUxFQ1QgKiBGUk9NIHBlcmlvZGljX3R4cyBXSEVSRSBcbmp1bGlhbmRheSgnbm93JykgLSBqdWxpYW5kYXkoYXBwbGllZF9hdCkgPj0gZGF5cyBBTkQgdHlwZSA9IDE7IiwicmVzdWx0X3ZhcmlhYmxlIjoiXyIsInRpbWVvdXQiOm51bGx9","chunks":null,"kind":"Elixir.KinoDB.SQLCell","livebook_object":"smart_cell"} -->
 
 ```elixir
-egresos_fijos =
+_ =
   Exqlite.query!(
     conn,
     """
-    SELECT * FROM periodic_txs WHERE
+    SELECT * FROM periodic_txs WHERE 
     julianday('now') - julianday(applied_at) >= days AND type = 1;
     """,
     []
@@ -493,7 +492,7 @@ _ = Exqlite.query!(conn, "SELECT * FROM txs ORDER BY created_at DESC", [])
 <!-- livebook:{"output":true} -->
 
 ```text
-%Exqlite.Result{command: :execute, columns: ["id", "amount", "type", "description", "created_at"], rows: [[7, 500, 1, "A cup of coffe from a mermaid", "2024-05-13 03:36:45"], [8, 1000, 0, "Found 10 Bucks inside the sofa", "2024-05-13 03:36:45"], [1, 200000, 0, "Salary", "2024-05-13 03:36:39"], [2, 1000, 1, "Video Stream Service", "2024-05-13 03:36:39"], [3, 5000, 1, "Basic Services", "2024-05-13 03:36:39"], [4, 4000, 1, "Internet + Phone", "2024-05-13 03:36:39"], [5, 10000, 1, "Food", "2024-05-13 03:36:39"], [6, 3000, 1, "Transport", "2024-05-13 03:36:39"]], num_rows: 8}
+%Exqlite.Result{command: :execute, columns: ["id", "amount", "type", "description", "created_at"], rows: [[7, 500, 1, "A cup of coffe from a mermaid", "2024-05-13 03:59:54"], [8, 1000, 0, "Found 10 Bucks inside the sofa", "2024-05-13 03:59:54"], [1, 200000, 0, "Salary", "2024-05-13 03:59:50"], [2, 1000, 1, "Video Stream Service", "2024-05-13 03:59:50"], [3, 5000, 1, "Basic Services", "2024-05-13 03:59:50"], [4, 4000, 1, "Internet + Phone", "2024-05-13 03:59:50"], [5, 10000, 1, "Food", "2024-05-13 03:59:50"], [6, 3000, 1, "Transport", "2024-05-13 03:59:50"]], num_rows: 8}
 ```
 
 How much income do we have so far?
@@ -543,9 +542,9 @@ _ =
   Exqlite.query!(
     conn,
     """
-    SELECT * FROM txs WHERE
-      created_at BETWEEN
-        datetime('now', 'start of month')
+    SELECT * FROM txs WHERE 
+      created_at BETWEEN 
+        datetime('now', 'start of month') 
         AND datetime('now', 'start of month', '+1 month', '-1 day')
     """,
     []
@@ -555,7 +554,7 @@ _ =
 <!-- livebook:{"output":true} -->
 
 ```text
-%Exqlite.Result{command: :execute, columns: ["id", "amount", "type", "description", "created_at"], rows: [[1, 200000, 0, "Salary", "2024-05-13 03:36:39"], [2, 1000, 1, "Video Stream Service", "2024-05-13 03:36:39"], [3, 5000, 1, "Basic Services", "2024-05-13 03:36:39"], [4, 4000, 1, "Internet + Phone", "2024-05-13 03:36:39"], [5, 10000, 1, "Food", "2024-05-13 03:36:39"], [6, 3000, 1, "Transport", "2024-05-13 03:36:39"], [7, 500, 1, "A cup of coffe from a mermaid", "2024-05-13 03:36:45"], [8, 1000, 0, "Found 10 Bucks inside the sofa", "2024-05-13 03:36:45"]], num_rows: 8}
+%Exqlite.Result{command: :execute, columns: ["id", "amount", "type", "description", "created_at"], rows: [[1, 200000, 0, "Salary", "2024-05-13 03:59:50"], [2, 1000, 1, "Video Stream Service", "2024-05-13 03:59:50"], [3, 5000, 1, "Basic Services", "2024-05-13 03:59:50"], [4, 4000, 1, "Internet + Phone", "2024-05-13 03:59:50"], [5, 10000, 1, "Food", "2024-05-13 03:59:50"], [6, 3000, 1, "Transport", "2024-05-13 03:59:50"], [7, 500, 1, "A cup of coffe from a mermaid", "2024-05-13 03:59:54"], [8, 1000, 0, "Found 10 Bucks inside the sofa", "2024-05-13 03:59:54"]], num_rows: 8}
 ```
 
 Check for Today, Week, Month and Year stats
@@ -775,7 +774,7 @@ monthly_amount =
   |> ceil()
 
 daily_rate =
-  (monthly_amount / 30)
+  ((monthly_incomes - monthly_expenses) / 30 / 100)
   |> ceil()
 
 %{monthly_amount: monthly_amount, daily_rate: daily_rate}
